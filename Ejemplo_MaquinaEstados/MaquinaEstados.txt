@@ -28,14 +28,14 @@ estado_semaforo:
 estado_rojo:
     ldr r4, =Base_maquina_0
     ldr r0, [r4, #entrada_tiempo_M0]  // el tiempo que va entrando 
-    ldr r5, =TIEMPO_ROJO             // el tiempo que deberia durar el estado 
+    ldr r5, =TIEMPO_AMARILLO             // el tiempo que deberia durar el estado 
     cmp r0, r5              // compara si el tiempo transucrrido es igual al tiempo seleccionado en la configuracion para el estado rojo
     blt fin_estado          // si r0 -r5, es decir si aun no ha pasado el tiempo, vuelve al estado semaforo, revisa en qué estado se esta y si sigue en rojo, vuelve, y vuelve a comparar los tiempos
  
     // Salidas              // si ya los tiempos se cumplieron, enciende y apaga los leds respectivos
     ldr r0, =GPIOB_PCOR     //PCOR = pone un 1 para clear(0)
-    mov r1, #(1 << LED_ROJO) // prende el led rojo
-    str r1, [r0]                      
+    mov r1, #(1 << LED_ROJO) // prende el led rojo --> moviendo el 1 a la izquierda el offset de LED_ROJO
+    str r1, [r0]            //guarda en el PCOR del puerto B
  
     ldr r0, =GPIOB_PSOR     // PSOR = cuando pone un 1 lo pone en 1
     mov r1, #(1 << LED_AMARILLO) // apaga los leds amarillos y verdes
@@ -45,9 +45,9 @@ estado_rojo:
  
     // Cambiar al siguiente estado 
     mov r1, #ROJO_AMARILLO
-    str r1, [r4, #var_estado_M0]
+    str r1, [r4, #var_estado_M0]        // le dice a la maquina que el estado es el siguiente
     mov r2, #0
-    str r2, [r4, entrada_tiempo_M0]  
+    str r2, [r4, entrada_tiempo_M0]     //reinicia el tiempo
     pop {lr}
     bx lr
  
@@ -55,7 +55,7 @@ estado_rojo:
 estado_rojo_amarillo:
     ldr r4, =Base_maquina_0
     ldr r0, [r4, #entrada_tiempo_M0]  
-    ldr r5, =TIEMPO_ROJO_AMARILLO     
+    ldr r5, =TIEMPO_ROJO     
     cmp r0, r5
     blt fin_estado                    
  
@@ -80,7 +80,7 @@ estado_rojo_amarillo:
 estado_verde:
     ldr r4, =Base_maquina_0
     ldr r0, [r4, #entrada_tiempo_M0]  
-    ldr r5, =TIEMPO_VERDE             
+    ldr r5, =TIEMPO_ROJO_AMARILLO             
     cmp r0, r5
     blt fin_estado                    
  
@@ -107,7 +107,7 @@ estado_verde:
 estado_amarillo:
     ldr r4, =Base_maquina_0
     ldr r0, [r4, #entrada_tiempo_M0]  
-    ldr r5, =TIEMPO_AMARILLO          
+    ldr r5, =TIEMPO_VERDE          
     cmp r0, r5
     blt fin_estado                    
  

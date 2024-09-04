@@ -44,10 +44,10 @@
     .equ LED_VERDE, 14                   // LED Verde conectado a PTB14
 
     // Definición de los tiempos en ciclos de reloj (ajustar según la frecuencia del microcontrolador)
-    .equ TIEMPO_ROJO, 3000               
-    .equ TIEMPO_ROJO_AMARILLO, 5000      
-    .equ TIEMPO_VERDE, 2000              
-    .equ TIEMPO_AMARILLO, 3000           
+    .equ TIEMPO_ROJO, 5000               
+    .equ TIEMPO_ROJO_AMARILLO, 3000      
+    .equ TIEMPO_VERDE, 5000              
+    .equ TIEMPO_AMARILLO, 2000           
 
     // Definición de los estados
     .equ ROJO, 0
