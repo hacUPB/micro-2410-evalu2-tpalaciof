@@ -2,6 +2,7 @@
  
   .syntax unified
   .global estado_leds
+  .global Activarfilas
   .text
  
     .thumb_func 
@@ -15,6 +16,7 @@ estado_leds:
     bx r1                          // va a la subrutina del estado correspondiente 
  
     .thumb_func
+
 COL1: 
     ldr r4, =Base_maquina_0
     ldr r0, [r4, #entrada_tiempo_M0]  // el tiempo que va entrando 
@@ -63,7 +65,8 @@ COL1:
     pop {lr}
     bx lr
 
-    .thumb_func 
+    .thumb_func
+     
 COL2: 
     ldr r4, =Base_maquina_0
     ldr r0, [r4, #entrada_tiempo_M0]  // el tiempo que va entrando 
@@ -104,10 +107,6 @@ COL2:
  
     bl Activarfilas
       
-
-
-
-
     // Cambiar al siguiente estado 
     mov r1, #col3
     str r1, [r4, #var_estado_M0]        // le dice a la maquina que el estado es el siguiente
@@ -117,6 +116,7 @@ COL2:
     bx lr
 
     .thumb_func 
+
 COL3:
     ldr r4, =Base_maquina_0
     ldr r0, [r4, #entrada_tiempo_M0]  // el tiempo que va entrando 
@@ -124,8 +124,6 @@ COL3:
     cmp r0, r5              
     blt fin_estado
     
-
-
     // Desactiva las filas
     ldr     r0, =#GPIOE_BASE
     ldr     r5, =#GPIOE                 //las filas se desactivan con 1
@@ -142,7 +140,6 @@ COL3:
 
     str     r5, [r10, #GPIO_PDOR_OFFSET]
 
-    
     //Activa la tercera columna
     ldr     r10, =#GPIOB_BASE
     ldr     r11, [r10, #GPIO_PDOR_OFFSET]
@@ -158,9 +155,6 @@ COL3:
  
     bl Activarfilas
 
-
-
-
     // Cambiar al siguiente estado 
     mov r1, #col4
     str r1, [r4, #var_estado_M0]        // le dice a la maquina que el estado es el siguiente
@@ -170,6 +164,7 @@ COL3:
     bx lr 
 
     .thumb_func 
+
 COL4:
     ldr r4, =Base_maquina_0
     ldr r0, [r4, #entrada_tiempo_M0]  // el tiempo que va entrando 
@@ -177,8 +172,6 @@ COL4:
     cmp r0, r5              
     blt fin_estado
     
-
-
     // Desactiva las filas
     ldr     r0, =#GPIOE_BASE
     ldr     r5, =#GPIOE                 //las filas se desactivan con 1
@@ -195,7 +188,6 @@ COL4:
 
     str     r5, [r10, #GPIO_PDOR_OFFSET]
 
-    
     //Activa la cuarta columna
     ldr     r10, =#GPIOB_BASE
     ldr     r11, [r10, #GPIO_PDOR_OFFSET]
@@ -211,10 +203,6 @@ COL4:
  
     bl Activarfilas
 
-
-
-
-
     // Cambiar al siguiente estado 
     mov r1, #col5
     str r1, [r4, #var_estado_M0]        // le dice a la maquina que el estado es el siguiente
@@ -224,6 +212,7 @@ COL4:
     bx lr 
 
     .thumb_func 
+
 COL5:
     ldr r4, =Base_maquina_0
     ldr r0, [r4, #entrada_tiempo_M0]  // el tiempo que va entrando 
@@ -247,7 +236,6 @@ COL5:
     and     r5, r1, r0
 
     str     r5, [r10, #GPIO_PDOR_OFFSET]
-
     
     //Activa la quinta columna
     ldr     r10, =#GPIOB_BASE
@@ -264,7 +252,6 @@ COL5:
  
     bl Activarfilas
     
-
     // Cambiar al siguiente estado 
     mov r1, #col6
     str r1, [r4, #var_estado_M0]        // le dice a la maquina que el estado es el siguiente
@@ -274,6 +261,7 @@ COL5:
     bx lr 
 
     .thumb_func 
+
 COL6:
     ldr r4, =Base_maquina_0
     ldr r0, [r4, #entrada_tiempo_M0]  // el tiempo que va entrando 
@@ -281,8 +269,6 @@ COL6:
     cmp r0, r5              
     blt fin_estado
     
-
-
     // Desactiva las filas
     ldr     r0, =#GPIOE_BASE
     ldr     r5, =#GPIOE                 //las filas se desactivan con 1
@@ -315,8 +301,6 @@ COL6:
  
     bl Activarfilas
 
-
-
     // Cambiar al siguiente estado 
     mov r1, #col7
     str r1, [r4, #var_estado_M0]        // le dice a la maquina que el estado es el siguiente
@@ -325,7 +309,8 @@ COL6:
     pop {lr}
     bx lr
     
-    .thumb_func  
+    .thumb_func 
+     
 COL7:
     ldr r4, =Base_maquina_0
     ldr r0, [r4, #entrada_tiempo_M0]  // el tiempo que va entrando 
@@ -350,7 +335,6 @@ COL7:
 
     str     r5, [r10, #GPIO_PDOR_OFFSET]
 
-    
     //Activa la septima columna
     ldr     r10, =#GPIOB_BASE
     ldr     r11, [r10, #GPIO_PDOR_OFFSET]
@@ -366,9 +350,6 @@ COL7:
  
     bl Activarfilas
 
-
-
-
     // Cambiar al siguiente estado 
     mov r1, #col8
     str r1, [r4, #var_estado_M0]        // le dice a la maquina que el estado es el siguiente
@@ -378,6 +359,7 @@ COL7:
     bx lr 
 
     .thumb_func 
+
 COL8:
     ldr r4, =Base_maquina_0
     ldr r0, [r4, #entrada_tiempo_M0]  // el tiempo que va entrando 
@@ -426,296 +408,10 @@ COL8:
     str r2, [r4, entrada_tiempo_M0]     //reinicia el tiempo
     pop {lr}
     bx lr 
-
  
 fin_estado:
     pop {lr}
     bx lr
-
-Activarfilas: 
-    mov  r8, #1
-    and  r9, r7, r8  
-    cmp  r8, r9
-    beq fila1
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp  r8, r9
-    beq fila2
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila3
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila4
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila5
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila6
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila7
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila8
-
-    bx lr
-
-
-fila1: 
-    ldr     r10, =#GPIOE_BASE
-    ldr     r1, [r10, #GPIO_PDOR_OFFSET]
-    
-    mov     r0, #1
-    lsl     r0, #GPIOE16_OFFSET
-    bic     r5, r1, r0
-    
-    str     r5, [r10, #GPIO_PDOR_OFFSET]
-    
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp  r8, r9
-    beq fila2
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila3
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila4
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila5
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila6
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila7
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila8
-
-    bx lr
-
-fila2: 
-    ldr     r10, =#GPIOE_BASE
-    ldr     r1, [r10, #GPIO_PDOR_OFFSET]
-    
-    mov     r0, #1
-    lsl     r0, #GPIOE15_OFFSET
-    bic     r5, r1, r0
-    
-    str     r5, [r10, #GPIO_PDOR_OFFSET]
-
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila3
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila4
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila5
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila6
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila7
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila8
-
-    bx lr 
-
-fila3: 
-    ldr     r10, =#GPIOE_BASE
-    ldr     r1, [r10, #GPIO_PDOR_OFFSET]
-    
-    mov     r0, #1
-    lsl     r0, #GPIOE11_OFFSET
-    bic     r5, r1, r0
-    
-    str     r5, [r10, #GPIO_PDOR_OFFSET]
-    
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila4
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila5
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila6
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila7
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila8
-
-    bx lr 
-
-fila4: 
-    ldr     r10, =#GPIOE_BASE
-    ldr     r1, [r10, #GPIO_PDOR_OFFSET]
-    
-    mov     r0, #1
-    lsl     r0, #GPIOE10_OFFSET
-    bic     r5, r1, r0
-    
-    str     r5, [r10, #GPIO_PDOR_OFFSET]
-
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila5
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila6
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila7
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila8
-
-    bx lr  
-
-fila5: 
-    ldr     r10, =#GPIOE_BASE
-    ldr     r1, [r10, #GPIO_PDOR_OFFSET]
-    
-    mov     r0, #1
-    lsl     r0, #GPIOE5_OFFSET
-    bic     r5, r1, r0
-    
-    str     r5, [r10, #GPIO_PDOR_OFFSET] 
-
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila6
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila7
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila8
-
-    bx lr  
-
-fila6: 
-    ldr     r10, =#GPIOE_BASE
-    ldr     r1, [r10, #GPIO_PDOR_OFFSET]
-    
-    mov     r0, #1
-    lsl     r0, #GPIOE4_OFFSET
-    bic     r5, r1, r0
-    
-    str     r5, [r10, #GPIO_PDOR_OFFSET]
-
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila7
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila8
-
-    bx lr 
-
-fila7: 
-    ldr     r10, =#GPIOE_BASE
-    ldr     r1, [r10, #GPIO_PDOR_OFFSET]
-    
-    mov     r0, #1
-    lsl     r0, #GPIOE2_OFFSET
-    bic     r5, r1, r0
-    
-    str     r5, [r10, #GPIO_PDOR_OFFSET]
-    
-
-    lsl  r8, #1
-    and  r9, r7, r8    
-    cmp r8, r9
-    beq fila8
-
-    bx lr
-
-
-fila8: 
-    ldr     r10, =#GPIOE_BASE
-    ldr     r1, [r10, #GPIO_PDOR_OFFSET]
-    
-    mov     r0, #1
-    lsl     r0, #GPIOE6_OFFSET
-    bic     r5, r1, r0
-    
-    str     r5, [r10, #GPIO_PDOR_OFFSET]
-    bx lr 
 
 
 .section .rodata

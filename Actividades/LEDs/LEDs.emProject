@@ -53,6 +53,7 @@
     </folder>
     <folder Name="Source Files">
       <configuration Name="Common" filter="c;cpp;cxx;cc;h;s;asm;inc" />
+      <file file_name="Activarfilas.s" />
       <file file_name="definitions.h" />
       <file file_name="Maquina_Estados.s" />
       <file file_name="start.s" />

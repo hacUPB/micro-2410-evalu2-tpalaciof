@@ -137,11 +137,11 @@ loop_col:
 
 .section .rodata
 leds:
-    .byte 0b11100000 // Representación de la primera columna de LEDs
-    .byte 0b10100000 
-    .byte 0b11111110 
-    .byte 0b00100101 // columna 4 
-    .byte 0b00100101 
-    .byte 0b11111110 
-    .byte 0b10100000 
-    .byte 0b11100000 
+    .byte 0b00000000 // Representación de la primera columna de LEDs
+    .byte 0b01110100 
+    .byte 0b00010100 
+    .byte 0b01111100 // columna 4 
+    .byte 0b01010000 
+    .byte 0b01011100 
+    .byte 0b00000000 
+    .byte 0b00000000 
