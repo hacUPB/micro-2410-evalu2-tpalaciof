@@ -1,0 +1,229 @@
+  #include "definitions.h"
+
+  .syntax unified
+  .global _start
+  .extern estado_semaforo  
+  .text
+
+  .thumb_func
+
+_start:
+    bl PTB_init         s
+    bl gpioB_init       
+    bl systick_config   
+
+    // Máquina de estados
+    ldr r4, =Base_maquina_0
+    mov r1, #ROJO                     
+    str r1, [r4, #var_estado_M0]
+    mov r2, #0
+    str r2, [r4, entrada_tiempo_M0]   
+
+    // Bucle principal
+loop_principal:
+    bl estado_semaforo                
+    b loop_principal                  
+
+
+// Configuraciones iniciales
+gpioB_init:    
+    ldr r0, =GPIOB_PDDR               
+    ldr r1, [r0]
+    orr r1, r1, #(1 << LED_ROJO)      
+    orr r1, r1, #(1 << LED_AMARILLO)  
+    orr r1, r1, #(1 << LED_VERDE)     
+    str r1, [r0]                      
+
+    ldr r0, =GPIOB_PSOR
+    mov r1, #(1 << LED_ROJO)
+    str r1, [r0]                      
+    mov r1, #(1 << LED_AMARILLO)
+    str r1, [r0]                      
+    mov r1, #(1 << LED_VERDE)   
+    str r1, [r0]                    
+    bx  lr
+
+
+    // Subrutina de configuración de periféricos
+PTB_init:
+    // Habilitar el reloj para el puerto B
+    ldr r0, =PCC_PORTB                 
+    ldr r1, [r0]                       
+    orr r1, r1, #PCC_PORTB_CGC         
+    str r1, [r0]                       
+
+    // Configurar el puerto
+    ldr r0, =PORTB_PCR12               
+    ldr r1, [r0]                       
+    bic r1, r1, #(0x7 << 8)            
+    orr r1, r1, #(MUX_GPIO << 8)       
+    str r1, [r0]                       
+
+    // Configurar el puerto
+    ldr r0, =PORTB_PCR13               
+    ldr r1, [r0]
+    bic r1, r1, #(0x7 << 8)
+    orr r1, r1, #(MUX_GPIO << 8)
+    str r1, [r0]
+
+    // Configurar el puerto
+    ldr r0, =PORTB_PCR14               
+    ldr r1, [r0]
+    bic r1, r1, #(0x7 << 8)
+    orr r1, r1, #(MUX_GPIO << 8)
+    str r1, [r0]
+
+    // Retornar de la subrutina
+    bx lr
+
+
+systick_config:
+   // Configurar SysTick 
+    ldr r0, =SYST_RVR
+    ldr r1, =SYSTICK_RELOAD_1MS
+    str r1, [r0]                      
+
+    ldr r0, =SYST_CVR
+    mov r1, #0
+    str r1, [r0]                      
+
+    ldr r0, =SYST_CSR
+    mov r1, #(SYSTICK_ENABLE | SYSTICK_TICKINT | SYSTICK_CLKSOURCE)
+    str r1, [r0]                      // Habilitar el SysTick, la interrupción y seleccionar el reloj del procesador
+    bx  lr
+
+------------------------------------------------------------------------------------------------------------------------
+      
+   #include "definitions.h"
+
+  .syntax unified
+  .global estado_semaforo
+  .text
+
+
+  .align 2                // Alinear la tabla de direcciones a 4 bytes (2^2 = 4)
+// Lista de direcciones de los estados
+dir_tabla_estados:                      // Hace una lista y el compilador se encarga de las direcciones 
+  .long estado_rojo           //0
+  .long estado_rojo_amarillo  //1
+  .long estado_verde          //2
+  .long estado_amarillo       //3
+
+    .thumb_func
+
+estado_semaforo:            //Determina cual es el estado del la Máquina de estados 
+    push {lr}
+    ldr r4, =Base_maquina_0
+    ldr r0, [r4, #var_estado_M0]   
+    lsl r0, #2                     // multiplica por 4, para encontrar la ubicación en la memoria
+    ldr r4, =dir_tabla_estados     // en esa dirección de memoria se encuentra el código del estado
+    ldr r1, [r4, r0]               
+    bx r1                          // escribe en el pc la dirección que está en r1, es decir, a la dirección de memoria de alguno de los estados
+
+    .thumb_func
+estado_rojo:
+    ldr r4, =Base_maquina_0
+    ldr r0, [r4, #entrada_tiempo_M0]    //estamos leyendo la entrada
+    ldr r5, =TIEMPO_ROJO                // el tiempo que debe durar el estado
+    cmp r0, r5                          // compara ambos tiempos 
+    blt fin_estado                      //va a fin_estado --->hasta que no se alcance el tiempo, se volverá una y otra vez a este estado
+
+    // Salidas
+    ldr r0, =GPIOB_PCOR
+    mov r1, #(1 << LED_VERDE)
+    str r1, [r0]                      
+
+    ldr r0, =GPIOB_PSOR
+    mov r1, #(1 << LED_AMARILLO)
+    str r1, [r0]                      
+    mov r1, #(1 << LED_ROJO)
+    str r1, [r0]                      
+
+    // Cambiar al siguiente estado 
+    mov r1, #ROJO_AMARILLO
+    str r1, [r4, #var_estado_M0]    //le pone un 1 a la variable de estado, y hace que cambie el estado anterior que era 0
+    pop {lr}
+    bx lr
+
+    .thumb_func
+estado_rojo_amarillo:
+    ldr r4, =Base_maquina_0
+    ldr r0, [r4, #entrada_tiempo_M0]  
+    ldr r5, =TIEMPO_ROJO_AMARILLO     
+    cmp r0, r5
+    blt fin_estado                    
+
+    // Configura la salida
+    ldr r0, =GPIOB_PSOR
+    mov r1, #(1 << LED_ROJO) | (1 << LED_AMARILLO)
+    str r1, [r0]                      
+
+    ldr r0, =GPIOB_PSOR
+    mov r1, #(1 << LED_VERDE)
+    str r1, [r0]                      
+
+    // Cambiar al siguiente estado 
+    mov r1, #VERDE
+    str r1, [r4, #var_estado_M0]
+    mov r2, #0
+    str r2, [r4, entrada_tiempo_M0]   
+    pop {lr}
+    bx lr
+
+    .thumb_func
+estado_verde:
+    ldr r4, =Base_maquina_0
+    ldr r0, [r4, #entrada_tiempo_M0]  
+    ldr r5, =TIEMPO_VERDE             
+    cmp r0, r5
+    blt fin_estado                    
+
+    // Configura salida
+    ldr r0, =GPIOB_PSOR
+    mov r1, #(1 << LED_ROJO)
+    str r1, [r0]                      
+
+    ldr r0, =GPIOB_PCOR
+    mov r1, #(1 << LED_VERDE)
+    str r1, [r0]                      
+    mov r1, #(1 << LED_AMARILLO)
+    str r1, [r0]                      
+
+    // Cambiar al siguiente estado 
+    mov r1, #AMARILLO
+    str r1, [r4, #var_estado_M0]
+    mov r2, #0
+    str r2, [r4, entrada_tiempo_M0]   
+    pop {lr}
+    bx lr
+
+    .thumb_func
+estado_amarillo:
+    ldr r4, =Base_maquina_0
+    ldr r0, [r4, #entrada_tiempo_M0]  
+    ldr r5, =TIEMPO_AMARILLO          
+    cmp r0, r5
+    blt fin_estado                    
+
+    // Configurar salida
+    ldr r0, =GPIOB_PCOR
+    mov r1, #(1 << LED_AMARILLO)
+    str r1, [r0]                      
+
+    ldr r0, =GPIOB_PCOR
+    mov r1, #(1 << LED_ROJO)
+    str r1, [r0]                      
+    mov r1, #(1 << LED_VERDE)
+    str r1, [r0]          
+                
+    // Cambiar al siguiente estado 
+    mov r1, #ROJO
+    str r1, [r4, #var_estado_M0]
+    mov r2, #0
+    str r2, [r4, entrada_tiempo_M0]   
+    pop {lr}
+    bx lr
+
+fin_estado:         // retorna a la función principal
+    pop {lr}
+    bx lr
